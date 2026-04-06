@@ -4,16 +4,16 @@ import { PYQS } from '@/data/pyqs';
 import { TOPICS } from '@/data/syllabus';
 import { useProgress } from '@/context/ProgressContext';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { use, useState } from 'react';
 
 export default function PYQSolutionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const pyq = PYQS.find(p => p.id === id);
+  if (!pyq) notFound();
   const progress = useProgress();
   const [revealedSteps, setRevealedSteps] = useState<number[]>([]);
   const [showAll, setShowAll] = useState(false);
-
-  if (!pyq) return <div className="max-w-4xl mx-auto px-4 py-12 text-center text-[#64748b]">PYQ not found.</div>;
 
   const topic = TOPICS.find(t => t.id === pyq.topicId);
   const pyqIndex = PYQS.findIndex(p => p.id === id);

@@ -1,7 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { TOPICS } from '@/data/syllabus';
-import { PYQS } from '@/data/pyqs';
 
 interface ProgressState {
   completedTopics: string[];
@@ -39,9 +38,12 @@ export function ProgressProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('dm-study-progress');
-      if (saved) setState(JSON.parse(saved));
+      if (saved) {
+        const parsed = JSON.parse(saved) as ProgressState;
+        setTimeout(() => setState(parsed), 0);
+      }
     } catch {}
-    setMounted(true);
+    setTimeout(() => setMounted(true), 0);
   }, []);
 
   useEffect(() => {

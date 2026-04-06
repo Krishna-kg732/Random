@@ -4,12 +4,22 @@ import { QUIZZES } from '@/data/quizzes';
 import { TOPICS } from '@/data/syllabus';
 import { useProgress } from '@/context/ProgressContext';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { use, useState, useEffect, useCallback } from 'react';
+
+const CONFETTI_PARTICLES = Array.from({ length: 50 }, (_, i) => ({
+  id: i,
+  left: `${(i * 37) % 100}%`,
+  duration: 2 + ((i * 13) % 21) / 10,
+  delay: ((i * 7) % 5) / 10,
+  color: ['#7c3aed', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'][i % 5],
+}));
 
 export default function QuizPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const topic = TOPICS.find(t => t.slug === slug);
   const quiz = QUIZZES.find(q => q.topicId === topic?.id);
+  if (!topic || !quiz) notFound();
   const progress = useProgress();
 
   const [currentQ, setCurrentQ] = useState(0);
@@ -51,19 +61,13 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
   // Timer
   useEffect(() => {
     if (finished || answered) return;
-    if (timer <= 0) { handleAnswer(-1); return; }
+    if (timer <= 0) {
+      setTimeout(() => handleAnswer(-1), 0);
+      return;
+    }
     const t = setTimeout(() => setTimer(s => s - 1), 1000);
     return () => clearTimeout(t);
   }, [timer, finished, answered, handleAnswer]);
-
-  if (!topic || !quiz) {
-    return (
-      <div className="max-w-4xl mx-auto px-4 py-12 text-center text-[#64748b]">
-        <p className="text-lg mb-4">Quiz not found for this topic.</p>
-        <Link href="/topics" className="text-[#7c3aed] hover:underline">← Back to Topics</Link>
-      </div>
-    );
-  }
 
   if (finished) {
     const pct = Math.round((score / questions.length) * 100);
@@ -72,17 +76,17 @@ export default function QuizPage({ params }: { params: Promise<{ slug: string }>
         {/* Confetti */}
         {confetti && (
           <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
-            {Array.from({ length: 50 }).map((_, i) => (
+            {CONFETTI_PARTICLES.map((particle) => (
               <motion.div
-                key={i}
+                key={particle.id}
                 className="absolute w-3 h-3 rounded-full"
                 style={{
-                  left: `${Math.random() * 100}%`,
-                  background: ['#7c3aed', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'][i % 5],
+                  left: particle.left,
+                  background: particle.color,
                 }}
                 initial={{ top: '-10%', rotate: 0, opacity: 1 }}
                 animate={{ top: '110%', rotate: 720, opacity: 0 }}
-                transition={{ duration: 2 + Math.random() * 2, delay: Math.random() * 0.5, ease: 'easeIn' }}
+                transition={{ duration: particle.duration, delay: particle.delay, ease: 'easeIn' }}
               />
             ))}
           </div>

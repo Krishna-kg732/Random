@@ -3,11 +3,13 @@ import { motion } from 'framer-motion';
 import { TOPICS } from '@/data/syllabus';
 import { useProgress } from '@/context/ProgressContext';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { use, useState, useEffect } from 'react';
 
 export default function TopicDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const topic = TOPICS.find(t => t.slug === slug);
+  if (!topic) notFound();
   const progress = useProgress();
   const [activeSubtopic, setActiveSubtopic] = useState('');
 
@@ -26,8 +28,6 @@ export default function TopicDetailPage({ params }: { params: Promise<{ slug: st
     });
     return () => observer.disconnect();
   }, [topic]);
-
-  if (!topic) return <div className="max-w-4xl mx-auto px-4 py-12 text-center text-[#64748b]">Topic not found.</div>;
 
   const isComplete = progress.completedTopics.includes(topic.id);
   const topicIndex = TOPICS.findIndex(t => t.id === topic.id);

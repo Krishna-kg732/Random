@@ -4,13 +4,13 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { useProgress } from '@/context/ProgressContext';
 import { TOPICS } from '@/data/syllabus';
 import { PYQS } from '@/data/pyqs';
-import { MATH_SYMBOLS, MOTIVATIONAL_QUOTES, DEADLINE } from '@/lib/utils';
+import { MATH_SYMBOLS, MOTIVATIONAL_QUOTES } from '@/lib/utils';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 
 function AnimatedNumber({ value, duration = 1.5 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0);
-  const ref = useRef<number>();
+  const ref = useRef<number | null>(null);
   useEffect(() => {
     const start = Date.now();
     const animate = () => {
@@ -219,7 +219,7 @@ export default function Dashboard() {
               transition={{ duration: 0.5 }}
               className="p-4 rounded-xl bg-[#12121a] border border-[#7c3aed]/10 text-center"
             >
-              <p className="text-sm text-[#64748b] italic">"{MOTIVATIONAL_QUOTES[quoteIdx]}"</p>
+              <p className="text-sm text-[#64748b] italic">&ldquo;{MOTIVATIONAL_QUOTES[quoteIdx]}&rdquo;</p>
             </motion.div>
           </div>
         </div>
